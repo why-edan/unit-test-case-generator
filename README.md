@@ -2,7 +2,6 @@
 
 GenTest is a web application that helps developers automatically generate unit tests for their code. Built with React, Tailwind CSS, and React Router, this application provides an intuitive interface for generating comprehensive test cases for various programming languages.
 
-![GenTest Screenshot](public/screenshot.png)
 
 ## Features
 
