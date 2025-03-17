@@ -9,6 +9,21 @@ const languages = [
   { id: 'csharp', name: 'C#' },
 ];
 
+// Function to format code for display
+const formatCodeForDisplay = (code) => {
+  if (typeof code !== 'string') {
+    return JSON.stringify(code, null, 2);
+  }
+  
+  // Replace literal "\n" with actual newlines
+  let formatted = code.replace(/\\n/g, '\n');
+  
+  // Replace double backslashes
+  formatted = formatted.replace(/\\\\/g, '\\');
+  
+  return formatted;
+};
+
 export default function CodeEditor() {
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('python');
@@ -29,10 +44,41 @@ export default function CodeEditor() {
     
     try {
       const result = await generateTests(code, language);
-      setTestCases(result.testCases);
+      console.log('API Response:', result); // Log the response for debugging
+      
+      // Process the result to handle newlines
+      let processedResult;
+      
+      // Check the structure of the response and extract test cases
+      if (result && result.test_cases) {
+        processedResult = result.test_cases;
+      } else if (result && result.testCases) {
+        processedResult = result.testCases;
+      } else if (result && result.output) {
+        processedResult = result.output;
+      } else if (typeof result === 'string') {
+        processedResult = result;
+      } else {
+        // If none of the above, stringify the object with proper formatting
+        processedResult = JSON.stringify(result, null, 2);
+      }
+      
+      // Ensure newlines are properly handled
+      if (typeof processedResult === 'string') {
+        // First, replace literal "\n" strings with actual newlines
+        processedResult = processedResult.replace(/\\n/g, '\n');
+        
+        // Then, replace any double backslashes (which might be escaping the backslash)
+        processedResult = processedResult.replace(/\\\\/g, '\\');
+        
+        // Log the processed result for debugging
+        console.log('Processed result:', processedResult);
+      }
+      
+      setTestCases(processedResult);
     } catch (err) {
       setError('Failed to generate test cases. Please try again.');
-      console.error(err);
+      console.error('Error:', err);
     } finally {
       setLoading(false);
     }
@@ -100,8 +146,10 @@ export default function CodeEditor() {
       {testCases && (
         <div className="mt-8">
           <h3 className="text-xl font-semibold mb-4 text-gray-800">Generated Test Cases</h3>
-          <div className="bg-gray-100 p-4 rounded-md">
-            <pre className="whitespace-pre-wrap font-mono text-sm">{testCases}</pre>
+          <div className="bg-gray-100 p-4 rounded-md overflow-auto">
+            <pre className="font-mono text-sm" style={{ maxHeight: '500px', whiteSpace: 'pre-wrap' }}>
+              {formatCodeForDisplay(testCases)}
+            </pre>
           </div>
         </div>
       )}
