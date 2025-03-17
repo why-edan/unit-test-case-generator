@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create an axios instance with default config
 const api = axios.create({
-  baseURL: 'https://unit-test-case-generator.onrender.com/', // Replace with your FastAPI endpoint
+  baseURL: 'https://gentest-backend.onrender.com', // Replace with your FastAPI endpoint
   headers: {
     'Content-Type': 'application/json',
   },
